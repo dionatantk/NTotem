@@ -445,9 +445,18 @@
             lastProcessedLine = lastLine;
             addLog('📄 Processando: ' + lastLine);
 
+            // Extrai JSON da linha (remove timestamp se existir)
+            let jsonPart = lastLine;
+            
+            // Procura por { no início do JSON
+            const jsonStart = lastLine.indexOf('{');
+            if (jsonStart !== -1) {
+                jsonPart = lastLine.substring(jsonStart);
+            }
+
             // Tenta fazer parse do JSON
             try {
-                const data = JSON.parse(lastLine);
+                const data = JSON.parse(jsonPart);
                 updateDashboardData(data);
                 addLog('✅ Dados atualizados com sucesso');
             } catch (jsonError) {
@@ -589,5 +598,5 @@
             updateDashboard();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9842df351087128c',t:'MTc1ODcyMzA5Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9842ed8251d6f502',t:'MTc1ODcyMzY4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
