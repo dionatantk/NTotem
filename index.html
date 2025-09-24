@@ -172,38 +172,42 @@
             }
         }
 
-        // Carrega do Google Drive
-        async function loadFromDrive() {
-            const driveBtn = document.getElementById('driveBtn');
-            driveBtn.disabled = true;
-            driveBtn.textContent = '🔄 Carregando...';
-            try {
-                const listUrl = `https://www.googleapis.com/drive/v3/files?q='${driveConfig.folderId}'+in+parents+and+name+contains+'.txt'&orderBy=modifiedTime+desc&fields=files(id,name,modifiedTime)&key=${driveConfig.apiKey}`;
-                const res = await fetch(listUrl);
-                const data = await res.json();
-                if (!data.files || data.files.length === 0) throw new Error("Nenhum .txt encontrado");
-                const latestFile = data.files[0];
-                addLog(`📄 Encontrado: ${latestFile.name}`);
+       async function loadFromDrive() {
+    const driveBtn = document.getElementById('driveBtn');
+    driveBtn.disabled = true;
+    driveBtn.textContent = '🔄 Carregando...';
+    try {
+        const listUrl = `https://www.googleapis.com/drive/v3/files?q='${driveConfig.folderId}'+in+parents&orderBy=modifiedTime+desc&fields=files(id,name,modifiedTime,mimeType)&key=${driveConfig.apiKey}`;
+        const res = await fetch(listUrl);
+        const data = await res.json();
+        if (!data.files || data.files.length === 0) throw new Error("Nenhum arquivo encontrado");
 
-                const downloadUrl = `https://www.googleapis.com/drive/v3/files/${latestFile.id}?alt=media&key=${driveConfig.apiKey}`;
-                const content = await (await fetch(downloadUrl)).text();
+        // Filtra apenas arquivos .txt pelo nome
+        const latestFile = data.files.find(f => f.name.toLowerCase().endsWith(".txt"));
+        if (!latestFile) throw new Error("Nenhum arquivo .txt encontrado na pasta");
 
-                currentFile = { name: latestFile.name, size: content.length, lastModified: new Date(latestFile.modifiedTime).getTime() };
-                fileName.textContent = currentFile.name;
-                fileDetails.textContent = `Tamanho: ${(currentFile.size/1024).toFixed(2)} KB`;
-                fileInfo.style.display = 'block';
+        addLog(`📄 Encontrado: ${latestFile.name}`);
 
-                processLogContent(content);
-                updateFileStatus(true);
-            } catch (err) {
-                console.error(err);
-                addLog('❌ Erro: ' + err.message);
-                updateFileStatus(false);
-            } finally {
-                driveBtn.disabled = false;
-                driveBtn.textContent = '☁️ Carregar do Google Drive';
-            }
-        }
+        const downloadUrl = `https://www.googleapis.com/drive/v3/files/${latestFile.id}?alt=media&key=${driveConfig.apiKey}`;
+        const content = await (await fetch(downloadUrl)).text();
+
+        currentFile = { name: latestFile.name, size: content.length, lastModified: new Date(latestFile.modifiedTime).getTime() };
+        fileName.textContent = currentFile.name;
+        fileDetails.textContent = `Tamanho: ${(currentFile.size/1024).toFixed(2)} KB`;
+        fileInfo.style.display = 'block';
+
+        processLogContent(content);
+        updateFileStatus(true);
+    } catch (err) {
+        console.error(err);
+        addLog('❌ Erro: ' + err.message);
+        updateFileStatus(false);
+    } finally {
+        driveBtn.disabled = false;
+        driveBtn.textContent = '☁️ Carregar do Google Drive';
+    }
+}
+
     </script>
 </body>
 </html>
