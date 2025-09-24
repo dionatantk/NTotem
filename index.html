@@ -182,9 +182,16 @@
         const data = await res.json();
         if (!data.files || data.files.length === 0) throw new Error("Nenhum arquivo encontrado");
 
-        // Filtra apenas arquivos .txt pelo nome
-        const latestFile = data.files.find(f => f.name.toLowerCase().endsWith(".txt"));
-        if (!latestFile) throw new Error("Nenhum arquivo .txt encontrado na pasta");
+       // Pega o arquivo mais recente (qualquer tipo)
+const latestFile = data.files[0]; 
+
+if (!latestFile) {
+    throw new Error("Nenhum arquivo encontrado na pasta");
+}
+
+// Só loga informação para debug
+addLog(`📄 Arquivo selecionado: ${latestFile.name} (MIME: ${latestFile.mimeType})`);
+
 
         addLog(`📄 Encontrado: ${latestFile.name}`);
 
