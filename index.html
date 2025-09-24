@@ -5,269 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Refeitório - Log Reader</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: white;
-        }
-
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .status {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-        }
-
-        .status-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #ff4757;
-            animation: pulse 2s infinite;
-        }
-
-        .status-dot.loaded {
-            background: #2ed573;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .upload-area {
-            width: 100%;
-            padding: 30px;
-            background: rgba(255,255,255,0.1);
-            border: 2px dashed rgba(255,255,255,0.3);
-            border-radius: 15px;
-            text-align: center;
-            margin-bottom: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .upload-area:hover {
-            background: rgba(255,255,255,0.15);
-            border-color: rgba(255,255,255,0.5);
-            transform: translateY(-2px);
-        }
-
-        .upload-area.dragover {
-            background: rgba(255,255,255,0.2);
-            border-color: #4facfe;
-        }
-
-        .upload-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .upload-text {
-            font-size: 16px;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .upload-subtext {
-            font-size: 14px;
-            opacity: 0.7;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .file-info {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .file-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .file-details {
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .card {
-            background: rgba(255,255,255,0.15);
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: transform 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .card-value {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #fff;
-        }
-
-        .card-label {
-            font-size: 14px;
-            opacity: 0.8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .sensor-card {
-            grid-column: 1 / -1;
-            background: rgba(255,255,255,0.1);
-        }
-
-        .log {
-            background: rgba(0,0,0,0.2);
-            border-radius: 15px;
-            padding: 15px;
-            max-height: 200px;
-            overflow-y: auto;
-            margin-top: 20px;
-        }
-
-        .log-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #fff;
-        }
-
-        .log-entry {
-            font-size: 12px;
-            opacity: 0.8;
-            margin-bottom: 5px;
-            padding: 5px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 5px;
-        }
-
-        .reset-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(45deg, #ff6b6b 0%, #ee5a24 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 14px;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: transform 0.2s;
-        }
-
-        .reset-btn:hover {
-            transform: translateY(-1px);
-        }
-
-        .reload-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 14px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: transform 0.2s;
-            display: none;
-        }
-
-        .reload-btn:hover {
-            transform: translateY(-1px);
-        }
-
-        .error-msg {
-            background: rgba(255, 107, 107, 0.2);
-            border: 1px solid rgba(255, 107, 107, 0.5);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
-            text-align: center;
-        }
-
-        .success-msg {
-            background: rgba(46, 213, 115, 0.2);
-            border: 1px solid rgba(46, 213, 115, 0.5);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
-            text-align: center;
-        }
+        /* --- estilos mantidos iguais ao seu código anterior --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+               background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+               min-height: 100vh; padding: 20px; color: white; }
+        .container { max-width: 400px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 28px; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .status { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;
+                  padding: 15px; background: rgba(255,255,255,0.1); border-radius: 15px; backdrop-filter: blur(10px);}
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; background: #ff4757; animation: pulse 2s infinite; }
+        .status-dot.loaded { background: #2ed573; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .upload-area { width: 100%; padding: 30px; background: rgba(255,255,255,0.1);
+                       border: 2px dashed rgba(255,255,255,0.3); border-radius: 15px; text-align: center;
+                       margin-bottom: 30px; cursor: pointer; transition: all 0.3s ease; position: relative; }
+        .upload-area:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.5); transform: translateY(-2px);}
+        .upload-area.dragover { background: rgba(255,255,255,0.2); border-color: #4facfe; }
+        .upload-icon { font-size: 48px; margin-bottom: 15px; display: block; }
+        .upload-text { font-size: 16px; margin-bottom: 10px; font-weight: bold; }
+        .upload-subtext { font-size: 14px; opacity: 0.7; }
+        .file-input { display: none; }
+        .file-info { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; margin-bottom: 20px; display: none; }
+        .file-name { font-weight: bold; margin-bottom: 5px; }
+        .file-details { font-size: 14px; opacity: 0.8; }
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .card { background: rgba(255,255,255,0.15); border-radius: 20px; padding: 20px; text-align: center;
+                backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: transform 0.3s ease; }
+        .card:hover { transform: translateY(-5px); }
+        .card-icon { font-size: 40px; margin-bottom: 10px; display: block; }
+        .card-value { font-size: 32px; font-weight: bold; margin-bottom: 5px; color: #fff; }
+        .card-label { font-size: 14px; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; }
+        .sensor-card { grid-column: 1 / -1; background: rgba(255,255,255,0.1); }
+        .log { background: rgba(0,0,0,0.2); border-radius: 15px; padding: 15px; max-height: 200px; overflow-y: auto; margin-top: 20px;}
+        .log-title { font-size: 16px; font-weight: bold; margin-bottom: 10px; color: #fff; }
+        .log-entry { font-size: 12px; opacity: 0.8; margin-bottom: 5px; padding: 5px; background: rgba(255,255,255,0.1); border-radius: 5px;}
+        .reset-btn { width: 100%; padding: 12px; background: linear-gradient(45deg, #ff6b6b 0%, #ee5a24 100%);
+                     border: none; border-radius: 10px; color: white; font-size: 14px; cursor: pointer; margin-top: 15px; transition: transform 0.2s;}
+        .reset-btn:hover { transform: translateY(-1px); }
+        .reload-btn { width: 100%; padding: 12px; background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+                      border: none; border-radius: 10px; color: white; font-size: 14px; cursor: pointer; margin-top: 10px; transition: transform 0.2s; display: none; }
+        .reload-btn:hover { transform: translateY(-1px); }
+        .error-msg { background: rgba(255, 107, 107, 0.2); border: 1px solid rgba(255, 107, 107, 0.5); border-radius: 10px; padding: 15px; margin: 10px 0; text-align: center;}
+        .success-msg { background: rgba(46, 213, 115, 0.2); border: 1px solid rgba(46, 213, 115, 0.5); border-radius: 10px; padding: 15px; margin: 10px 0; text-align: center;}
+        .drive-section { margin-bottom: 30px; text-align: center; }
+        .drive-btn { width: 100%; padding: 15px; background: linear-gradient(45deg, #34a853 0%, #137333 100%);
+                     border: none; border-radius: 15px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: transform 0.2s;}
+        .drive-btn:hover { transform: translateY(-2px); }
+        .drive-btn:disabled { opacity: 0.6; cursor: not-allowed; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>📊 Dashboard Refeitório</h1>
-        </div>
+        <div class="header"><h1>📊 Dashboard Refeitório</h1></div>
 
         <div class="status">
             <div class="status-dot" id="statusDot"></div>
             <span id="statusText">Aguardando arquivo de log</span>
         </div>
 
-        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-            <span class="upload-icon">📁</span>
-            <div class="upload-text">Carregar Arquivo de Log</div>
-            <div class="upload-subtext">Clique aqui ou arraste um arquivo .txt</div>
-            <input type="file" id="fileInput" class="file-input" accept=".txt" onchange="handleFileSelect(event)">
+        <div class="drive-section">
+            <button class="drive-btn" id="driveBtn" onclick="loadFromDrive()">☁️ Carregar do Google Drive</button>
+            <div class="drive-info"><small>Carrega o arquivo .txt mais recente da pasta configurada</small></div>
         </div>
 
         <div id="fileInfo" class="file-info">
@@ -275,42 +75,14 @@
             <div class="file-details" id="fileDetails"></div>
         </div>
 
-        <div id="errorMsg" class="error-msg" style="display: none;"></div>
-        <div id="successMsg" class="success-msg" style="display: none;"></div>
-
-        <button class="reload-btn" id="reloadBtn" onclick="reloadFile()" style="display: none;">
-            🔄 Recarregar Arquivo
-        </button>
-
         <div class="dashboard">
-            <div class="card">
-                <span class="card-icon">👥</span>
-                <div class="card-value" id="alunoCount">0</div>
-                <div class="card-label">Alunos</div>
-            </div>
-
-            <div class="card">
-                <span class="card-icon">🥤</span>
-                <div class="card-value" id="bebidaCount">0</div>
-                <div class="card-label">Bebidas</div>
-            </div>
-
-            <div class="card">
-                <span class="card-icon">🍽️</span>
-                <div class="card-value" id="comidaCount">0</div>
-                <div class="card-label">Comidas</div>
-            </div>
-
-            <div class="card sensor-card">
-                <span class="card-icon">📏</span>
-                <div class="card-value" id="sensorValue">0 cm</div>
-                <div class="card-label">Distância Sensor</div>
-            </div>
+            <div class="card"><span class="card-icon">👥</span><div class="card-value" id="alunoCount">0</div><div class="card-label">Alunos</div></div>
+            <div class="card"><span class="card-icon">🥤</span><div class="card-value" id="bebidaCount">0</div><div class="card-label">Bebidas</div></div>
+            <div class="card"><span class="card-icon">🍽️</span><div class="card-value" id="comidaCount">0</div><div class="card-label">Comidas</div></div>
+            <div class="card sensor-card"><span class="card-icon">📏</span><div class="card-value" id="sensorValue">0 cm</div><div class="card-label">Distância Sensor</div></div>
         </div>
 
-        <button class="reset-btn" onclick="resetCounters()">
-            🔄 Resetar Contadores
-        </button>
+        <button class="reset-btn" onclick="resetCounters()">🔄 Resetar Contadores</button>
 
         <div class="log">
             <div class="log-title">📋 Log de Atividades</div>
@@ -320,283 +92,118 @@
 
     <script>
         let currentFile = null;
-        let isFileLoaded = false;
         let lastProcessedLine = '';
+        let dados = { sensor: 0, bebida: 0, comida: 0, aluno: 0 };
 
-        // Dados do dashboard
-        let dados = {
-            sensor: 0,
-            bebida: 0,
-            comida: 0,
-            aluno: 0
+        let driveConfig = {
+            apiKey: "AIzaSyAunOmdlZSTPEdODMAjgHH8tuhKpsgBiU8",
+            folderId: "1mWeTjv9EXj9J63u214uXKdv4sTVQ754p"
         };
 
-        // Elementos DOM
         const statusDot = document.getElementById('statusDot');
         const statusText = document.getElementById('statusText');
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInfo = document.getElementById('fileInfo');
+        const logContainer = document.getElementById('logContainer');
         const fileName = document.getElementById('fileName');
         const fileDetails = document.getElementById('fileDetails');
-        const errorMsg = document.getElementById('errorMsg');
-        const successMsg = document.getElementById('successMsg');
-        const reloadBtn = document.getElementById('reloadBtn');
-        const logContainer = document.getElementById('logContainer');
+        const fileInfo = document.getElementById('fileInfo');
 
-        // Configuração de drag and drop
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
-
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
-
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleFile(files[0]);
-            }
-        });
-
-        // Manipula seleção de arquivo
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (file) {
-                handleFile(file);
-            }
+        // Atualiza status do arquivo
+        function updateFileStatus(loaded) {
+            if (loaded) { statusDot.classList.add('loaded'); statusText.textContent = 'Arquivo carregado'; }
+            else { statusDot.classList.remove('loaded'); statusText.textContent = 'Erro no arquivo'; }
         }
 
-        // Processa o arquivo selecionado
-        function handleFile(file) {
-            if (!file.name.toLowerCase().endsWith('.txt')) {
-                showError('Por favor, selecione um arquivo .txt');
-                return;
-            }
-
-            currentFile = file;
-            showFileInfo(file);
-            readFile(file);
-        }
-
-        // Mostra informações do arquivo
-        function showFileInfo(file) {
-            fileName.textContent = file.name;
-            fileDetails.textContent = `Tamanho: ${(file.size / 1024).toFixed(2)} KB | Modificado: ${new Date(file.lastModified).toLocaleString()}`;
-            fileInfo.style.display = 'block';
-        }
-
-        // Lê o conteúdo do arquivo
-        function readFile(file) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                try {
-                    const content = e.target.result;
-                    processLogContent(content);
-                    updateFileStatus(true);
-                    showSuccess('Arquivo carregado com sucesso!');
-                    reloadBtn.style.display = 'block';
-                } catch (error) {
-                    console.error('Erro ao processar arquivo:', error);
-                    showError('Erro ao processar o arquivo: ' + error.message);
-                    updateFileStatus(false);
-                }
-            };
-
-            reader.onerror = function() {
-                showError('Erro ao ler o arquivo');
-                updateFileStatus(false);
-            };
-
-            reader.readAsText(file);
-        }
-
-        // Processa o conteúdo do log
-        function processLogContent(content) {
-            const lines = content.trim().split('\n');
-            
-            if (lines.length === 0) {
-                throw new Error('Arquivo vazio');
-            }
-
-            // Pega a última linha não vazia
-            let lastLine = '';
-            for (let i = lines.length - 1; i >= 0; i--) {
-                if (lines[i].trim()) {
-                    lastLine = lines[i].trim();
-                    break;
-                }
-            }
-
-            if (!lastLine) {
-                throw new Error('Nenhuma linha válida encontrada');
-            }
-
-            // Verifica se é uma nova linha
-            if (lastLine === lastProcessedLine) {
-                addLog('📄 Mesmos dados da última leitura');
-                return;
-            }
-
-            lastProcessedLine = lastLine;
-            addLog('📄 Processando: ' + lastLine);
-
-            // Extrai JSON da linha (remove timestamp se existir)
-            let jsonPart = lastLine;
-            
-            // Procura por { no início do JSON
-            const jsonStart = lastLine.indexOf('{');
-            if (jsonStart !== -1) {
-                jsonPart = lastLine.substring(jsonStart);
-            }
-
-            // Tenta fazer parse do JSON
-            try {
-                const data = JSON.parse(jsonPart);
-                updateDashboardData(data);
-                addLog('✅ Dados atualizados com sucesso');
-            } catch (jsonError) {
-                // Se não for JSON válido, tenta extrair dados do formato texto
-                parseTextFormat(lastLine);
-            }
-        }
-
-        // Tenta extrair dados de formato texto alternativo
-        function parseTextFormat(line) {
-            // Procura por padrões como "sensor:10, bebida:5, comida:3, aluno:15"
-            const patterns = {
-                sensor: /sensor[:\s]*(\d+)/i,
-                bebida: /bebida[:\s]*(\d+)/i,
-                comida: /comida[:\s]*(\d+)/i,
-                aluno: /aluno[:\s]*(\d+)/i
-            };
-
-            const extractedData = {};
-            let foundData = false;
-
-            for (const [key, pattern] of Object.entries(patterns)) {
-                const match = line.match(pattern);
-                if (match) {
-                    extractedData[key] = parseInt(match[1]);
-                    foundData = true;
-                }
-            }
-
-            if (foundData) {
-                updateDashboardData(extractedData);
-                addLog('✅ Dados extraídos do formato texto');
-            } else {
-                throw new Error('Formato de dados não reconhecido na linha: ' + line);
-            }
-        }
-
-        // Atualiza os dados do dashboard
+        // Atualiza Dashboard
         function updateDashboardData(data) {
-            // Atualiza apenas os campos presentes nos dados
             if (data.sensor !== undefined) dados.sensor = data.sensor;
             if (data.bebida !== undefined) dados.bebida = data.bebida;
             if (data.comida !== undefined) dados.comida = data.comida;
             if (data.aluno !== undefined) dados.aluno = data.aluno;
 
-            updateDashboard();
-        }
-
-        // Atualiza o dashboard visual
-        function updateDashboard() {
             document.getElementById('alunoCount').textContent = dados.aluno;
             document.getElementById('bebidaCount').textContent = dados.bebida;
             document.getElementById('comidaCount').textContent = dados.comida;
             document.getElementById('sensorValue').textContent = dados.sensor + ' cm';
-
-            // Adiciona animação nos valores
-            animateValue('alunoCount');
-            animateValue('bebidaCount');
-            animateValue('comidaCount');
-            animateValue('sensorValue');
         }
 
-        // Animação para valores atualizados
-        function animateValue(elementId) {
-            const element = document.getElementById(elementId);
-            element.style.transform = 'scale(1.1)';
-            element.style.transition = 'transform 0.2s';
-            setTimeout(() => {
-                element.style.transform = 'scale(1)';
-            }, 200);
-        }
-
-        // Atualiza status do arquivo
-        function updateFileStatus(loaded) {
-            isFileLoaded = loaded;
-            
-            if (loaded) {
-                statusDot.classList.add('loaded');
-                statusText.textContent = 'Arquivo carregado';
-            } else {
-                statusDot.classList.remove('loaded');
-                statusText.textContent = 'Erro no arquivo';
-            }
-        }
-
-        // Recarrega o arquivo atual
-        function reloadFile() {
-            if (currentFile) {
-                addLog('🔄 Recarregando arquivo...');
-                readFile(currentFile);
-            }
-        }
-
-        // Reset dos contadores
-        function resetCounters() {
-            dados = { sensor: 0, bebida: 0, comida: 0, aluno: 0 };
-            updateDashboard();
-            addLog('🔄 Contadores resetados');
-        }
-
-        // Adiciona entrada no log
+        // Adiciona log visual
         function addLog(message) {
             const timestamp = new Date().toLocaleTimeString();
             const logEntry = document.createElement('div');
             logEntry.className = 'log-entry';
             logEntry.textContent = `${timestamp} - ${message}`;
-            
             logContainer.insertBefore(logEntry, logContainer.firstChild);
-            
-            // Mantém apenas as últimas 20 entradas
-            while (logContainer.children.length > 20) {
-                logContainer.removeChild(logContainer.lastChild);
+        }
+
+        // Reset contadores
+        function resetCounters() {
+            dados = { sensor: 0, bebida: 0, comida: 0, aluno: 0 };
+            updateDashboardData(dados);
+            addLog('🔄 Contadores resetados');
+        }
+
+        // Processa conteúdo do arquivo
+        function processLogContent(content) {
+            const lines = content.trim().split('\n');
+            if (lines.length === 0) throw new Error('Arquivo vazio');
+
+            let validLine = '';
+            for (let i = lines.length - 1; i >= 0; i--) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                if (line.includes('{') && line.includes('}')) { validLine = line; break; }
+            }
+
+            if (!validLine) throw new Error('Nenhuma linha JSON encontrada');
+
+            if (validLine === lastProcessedLine) { addLog('📄 Mesmos dados da última leitura'); return; }
+            lastProcessedLine = validLine;
+
+            const jsonStart = validLine.indexOf('{');
+            const jsonEnd = validLine.lastIndexOf('}');
+            const jsonPart = validLine.substring(jsonStart, jsonEnd + 1);
+
+            try {
+                const data = JSON.parse(jsonPart);
+                updateDashboardData(data);
+                addLog('✅ Dados atualizados: ' + jsonPart);
+            } catch (e) {
+                addLog('⚠️ JSON inválido: ' + jsonPart);
             }
         }
 
-        // Mostra mensagem de erro
-        function showError(message) {
-            errorMsg.textContent = message;
-            errorMsg.style.display = 'block';
-            successMsg.style.display = 'none';
-            setTimeout(() => {
-                errorMsg.style.display = 'none';
-            }, 5000);
-        }
+        // Carrega do Google Drive
+        async function loadFromDrive() {
+            const driveBtn = document.getElementById('driveBtn');
+            driveBtn.disabled = true;
+            driveBtn.textContent = '🔄 Carregando...';
+            try {
+                const listUrl = `https://www.googleapis.com/drive/v3/files?q='${driveConfig.folderId}'+in+parents+and+name+contains+'.txt'&orderBy=modifiedTime+desc&fields=files(id,name,modifiedTime)&key=${driveConfig.apiKey}`;
+                const res = await fetch(listUrl);
+                const data = await res.json();
+                if (!data.files || data.files.length === 0) throw new Error("Nenhum .txt encontrado");
+                const latestFile = data.files[0];
+                addLog(`📄 Encontrado: ${latestFile.name}`);
 
-        // Mostra mensagem de sucesso
-        function showSuccess(message) {
-            successMsg.textContent = message;
-            successMsg.style.display = 'block';
-            errorMsg.style.display = 'none';
-            setTimeout(() => {
-                successMsg.style.display = 'none';
-            }, 3000);
-        }
+                const downloadUrl = `https://www.googleapis.com/drive/v3/files/${latestFile.id}?alt=media&key=${driveConfig.apiKey}`;
+                const content = await (await fetch(downloadUrl)).text();
 
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', () => {
-            addLog('📱 Dashboard iniciado - Pronto para carregar arquivo');
-            updateDashboard();
-        });
+                currentFile = { name: latestFile.name, size: content.length, lastModified: new Date(latestFile.modifiedTime).getTime() };
+                fileName.textContent = currentFile.name;
+                fileDetails.textContent = `Tamanho: ${(currentFile.size/1024).toFixed(2)} KB`;
+                fileInfo.style.display = 'block';
+
+                processLogContent(content);
+                updateFileStatus(true);
+            } catch (err) {
+                console.error(err);
+                addLog('❌ Erro: ' + err.message);
+                updateFileStatus(false);
+            } finally {
+                driveBtn.disabled = false;
+                driveBtn.textContent = '☁️ Carregar do Google Drive';
+            }
+        }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9842ed8251d6f502',t:'MTc1ODcyMzY4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
