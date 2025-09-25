@@ -5,55 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Refeitório - Log Reader</title>
     <style>
-        /* --- estilos mantidos iguais ao seu código anterior --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-               background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-               min-height: 100vh; padding: 20px; color: white; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: white;
+        }
         .container { max-width: 400px; margin: 0 auto; }
         .header { text-align: center; margin-bottom: 30px; }
         .header h1 { font-size: 28px; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-        .status { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;
-                  padding: 15px; background: rgba(255,255,255,0.1); border-radius: 15px; backdrop-filter: blur(10px);}
+        .status {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.1);
+            border-radius: 15px; backdrop-filter: blur(10px);
+        }
         .status-dot { width: 12px; height: 12px; border-radius: 50%; background: #ff4757; animation: pulse 2s infinite; }
         .status-dot.loaded { background: #2ed573; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .upload-area { width: 100%; padding: 30px; background: rgba(255,255,255,0.1);
-                       border: 2px dashed rgba(255,255,255,0.3); border-radius: 15px; text-align: center;
-                       margin-bottom: 30px; cursor: pointer; transition: all 0.3s ease; position: relative; }
-        .upload-area:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.5); transform: translateY(-2px);}
-        .upload-area.dragover { background: rgba(255,255,255,0.2); border-color: #4facfe; }
-        .upload-icon { font-size: 48px; margin-bottom: 15px; display: block; }
-        .upload-text { font-size: 16px; margin-bottom: 10px; font-weight: bold; }
-        .upload-subtext { font-size: 14px; opacity: 0.7; }
-        .file-input { display: none; }
-        .file-info { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; margin-bottom: 20px; display: none; }
+        .drive-section { margin-bottom: 30px; text-align: center; }
+        .drive-btn {
+            width: 100%; padding: 15px;
+            background: linear-gradient(45deg, #34a853 0%, #137333 100%);
+            border: none; border-radius: 15px; color: white;
+            font-size: 16px; font-weight: bold; cursor: pointer;
+            margin-bottom: 10px; transition: transform 0.2s;
+        }
+        .drive-btn:hover { transform: translateY(-2px); }
+        .drive-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .file-info {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px; padding: 15px; margin-bottom: 20px; display: none;
+        }
         .file-name { font-weight: bold; margin-bottom: 5px; }
         .file-details { font-size: 14px; opacity: 0.8; }
         .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .card { background: rgba(255,255,255,0.15); border-radius: 20px; padding: 20px; text-align: center;
-                backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: transform 0.3s ease; }
+        .card {
+            background: rgba(255,255,255,0.15); border-radius: 20px; padding: 20px;
+            text-align: center; backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2); transition: transform 0.3s ease;
+        }
         .card:hover { transform: translateY(-5px); }
         .card-icon { font-size: 40px; margin-bottom: 10px; display: block; }
         .card-value { font-size: 32px; font-weight: bold; margin-bottom: 5px; color: #fff; }
         .card-label { font-size: 14px; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; }
         .sensor-card { grid-column: 1 / -1; background: rgba(255,255,255,0.1); }
-        .log { background: rgba(0,0,0,0.2); border-radius: 15px; padding: 15px; max-height: 200px; overflow-y: auto; margin-top: 20px;}
+        .log {
+            background: rgba(0,0,0,0.2); border-radius: 15px;
+            padding: 15px; max-height: 200px; overflow-y: auto; margin-top: 20px;
+        }
         .log-title { font-size: 16px; font-weight: bold; margin-bottom: 10px; color: #fff; }
-        .log-entry { font-size: 12px; opacity: 0.8; margin-bottom: 5px; padding: 5px; background: rgba(255,255,255,0.1); border-radius: 5px;}
-        .reset-btn { width: 100%; padding: 12px; background: linear-gradient(45deg, #ff6b6b 0%, #ee5a24 100%);
-                     border: none; border-radius: 10px; color: white; font-size: 14px; cursor: pointer; margin-top: 15px; transition: transform 0.2s;}
+        .log-entry {
+            font-size: 12px; opacity: 0.8; margin-bottom: 5px; padding: 5px;
+            background: rgba(255,255,255,0.1); border-radius: 5px;
+        }
+        .reset-btn {
+            width: 100%; padding: 12px; border: none; border-radius: 10px;
+            color: white; font-size: 14px; cursor: pointer;
+            margin-top: 10px; transition: transform 0.2s;
+        }
         .reset-btn:hover { transform: translateY(-1px); }
-        .reload-btn { width: 100%; padding: 12px; background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
-                      border: none; border-radius: 10px; color: white; font-size: 14px; cursor: pointer; margin-top: 10px; transition: transform 0.2s; display: none; }
-        .reload-btn:hover { transform: translateY(-1px); }
-        .error-msg { background: rgba(255, 107, 107, 0.2); border: 1px solid rgba(255, 107, 107, 0.5); border-radius: 10px; padding: 15px; margin: 10px 0; text-align: center;}
-        .success-msg { background: rgba(46, 213, 115, 0.2); border: 1px solid rgba(46, 213, 115, 0.5); border-radius: 10px; padding: 15px; margin: 10px 0; text-align: center;}
-        .drive-section { margin-bottom: 30px; text-align: center; }
-        .drive-btn { width: 100%; padding: 15px; background: linear-gradient(45deg, #34a853 0%, #137333 100%);
-                     border: none; border-radius: 15px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: transform 0.2s;}
-        .drive-btn:hover { transform: translateY(-2px); }
-        .drive-btn:disabled { opacity: 0.6; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -67,7 +77,7 @@
 
         <div class="drive-section">
             <button class="drive-btn" id="driveBtn" onclick="loadFromDrive()">☁️ Carregar do Google Drive</button>
-            <div class="drive-info"><small>Carrega o arquivo .txt mais recente da pasta configurada</small></div>
+            <div class="drive-info"><small>Carrega o arquivo mais recente da pasta configurada</small></div>
         </div>
 
         <div id="fileInfo" class="file-info">
@@ -82,7 +92,11 @@
             <div class="card sensor-card"><span class="card-icon">📏</span><div class="card-value" id="sensorValue">0 cm</div><div class="card-label">Distância Sensor</div></div>
         </div>
 
-        <button class="reset-btn" onclick="resetCounters()">🔄 Resetar Contadores</button>
+        <button class="reset-btn" onclick="resetCounters()" 
+                style="background: linear-gradient(45deg, #ff6b6b 0%, #ee5a24 100%);">🔄 Resetar Contadores</button>
+
+        <button class="reset-btn" onclick="exportToCSV()" 
+                style="background: linear-gradient(45deg, #00b894 0%, #55efc4 100%);">📥 Exportar Dados (CSV)</button>
 
         <div class="log">
             <div class="log-title">📋 Log de Atividades</div>
@@ -107,13 +121,11 @@
         const fileDetails = document.getElementById('fileDetails');
         const fileInfo = document.getElementById('fileInfo');
 
-        // Atualiza status do arquivo
         function updateFileStatus(loaded) {
             if (loaded) { statusDot.classList.add('loaded'); statusText.textContent = 'Arquivo carregado'; }
             else { statusDot.classList.remove('loaded'); statusText.textContent = 'Erro no arquivo'; }
         }
 
-        // Atualiza Dashboard
         function updateDashboardData(data) {
             if (data.sensor !== undefined) dados.sensor = data.sensor;
             if (data.bebida !== undefined) dados.bebida = data.bebida;
@@ -126,7 +138,6 @@
             document.getElementById('sensorValue').textContent = dados.sensor + ' cm';
         }
 
-        // Adiciona log visual
         function addLog(message) {
             const timestamp = new Date().toLocaleTimeString();
             const logEntry = document.createElement('div');
@@ -135,14 +146,12 @@
             logContainer.insertBefore(logEntry, logContainer.firstChild);
         }
 
-        // Reset contadores
         function resetCounters() {
             dados = { sensor: 0, bebida: 0, comida: 0, aluno: 0 };
             updateDashboardData(dados);
             addLog('🔄 Contadores resetados');
         }
 
-        // Processa conteúdo do arquivo
         function processLogContent(content) {
             const lines = content.trim().split('\n');
             if (lines.length === 0) throw new Error('Arquivo vazio');
@@ -153,9 +162,7 @@
                 if (!line) continue;
                 if (line.includes('{') && line.includes('}')) { validLine = line; break; }
             }
-
             if (!validLine) throw new Error('Nenhuma linha JSON encontrada');
-
             if (validLine === lastProcessedLine) { addLog('📄 Mesmos dados da última leitura'); return; }
             lastProcessedLine = validLine;
 
@@ -172,49 +179,54 @@
             }
         }
 
-       async function loadFromDrive() {
-    const driveBtn = document.getElementById('driveBtn');
-    driveBtn.disabled = true;
-    driveBtn.textContent = '🔄 Carregando...';
-    try {
-        const listUrl = `https://www.googleapis.com/drive/v3/files?q='${driveConfig.folderId}'+in+parents&orderBy=modifiedTime+desc&fields=files(id,name,modifiedTime,mimeType)&key=${driveConfig.apiKey}`;
-        const res = await fetch(listUrl);
-        const data = await res.json();
-        if (!data.files || data.files.length === 0) throw new Error("Nenhum arquivo encontrado");
+        async function loadFromDrive() {
+            const driveBtn = document.getElementById('driveBtn');
+            driveBtn.disabled = true;
+            driveBtn.textContent = '🔄 Carregando...';
+            try {
+                const listUrl = `https://www.googleapis.com/drive/v3/files?q='${driveConfig.folderId}'+in+parents&orderBy=modifiedTime desc&fields=files(id,name,modifiedTime,mimeType)&key=${driveConfig.apiKey}`;
+                const res = await fetch(listUrl);
+                const data = await res.json();
+                if (!data.files || data.files.length === 0) throw new Error("Nenhum arquivo encontrado");
 
-       // Pega o arquivo mais recente (qualquer tipo)
-const latestFile = data.files[0]; 
+                const latestFile = data.files[0];
+                addLog(`📄 Encontrado: ${latestFile.name}`);
 
-if (!latestFile) {
-    throw new Error("Nenhum arquivo encontrado na pasta");
-}
+                const downloadUrl = `https://www.googleapis.com/drive/v3/files/${latestFile.id}?alt=media&key=${driveConfig.apiKey}`;
+                const content = await (await fetch(downloadUrl)).text();
 
-// Só loga informação para debug
-addLog(`📄 Arquivo selecionado: ${latestFile.name} (MIME: ${latestFile.mimeType})`);
+                currentFile = { name: latestFile.name, size: content.length, lastModified: new Date(latestFile.modifiedTime).getTime() };
+                fileName.textContent = currentFile.name;
+                fileDetails.textContent = `Tamanho: ${(currentFile.size/1024).toFixed(2)} KB`;
+                fileInfo.style.display = 'block';
 
+                processLogContent(content);
+                updateFileStatus(true);
+            } catch (err) {
+                console.error(err);
+                addLog('❌ Erro: ' + err.message);
+                updateFileStatus(false);
+            } finally {
+                driveBtn.disabled = false;
+                driveBtn.textContent = '☁️ Carregar do Google Drive';
+            }
+        }
 
-        addLog(`📄 Encontrado: ${latestFile.name}`);
-
-        const downloadUrl = `https://www.googleapis.com/drive/v3/files/${latestFile.id}?alt=media&key=${driveConfig.apiKey}`;
-        const content = await (await fetch(downloadUrl)).text();
-
-        currentFile = { name: latestFile.name, size: content.length, lastModified: new Date(latestFile.modifiedTime).getTime() };
-        fileName.textContent = currentFile.name;
-        fileDetails.textContent = `Tamanho: ${(currentFile.size/1024).toFixed(2)} KB`;
-        fileInfo.style.display = 'block';
-
-        processLogContent(content);
-        updateFileStatus(true);
-    } catch (err) {
-        console.error(err);
-        addLog('❌ Erro: ' + err.message);
-        updateFileStatus(false);
-    } finally {
-        driveBtn.disabled = false;
-        driveBtn.textContent = '☁️ Carregar do Google Drive';
-    }
-}
-
+        function exportToCSV() {
+            const rows = [
+                ["Data/Hora", "Alunos", "Bebidas", "Comidas", "Sensor (cm)"],
+                [new Date().toLocaleString(), dados.aluno, dados.bebida, dados.comida, dados.sensor]
+            ];
+            let csvContent = rows.map(e => e.join(",")).join("\n");
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "dashboard_refeitorio.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     </script>
 </body>
 </html>
